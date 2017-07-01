@@ -1,11 +1,10 @@
-# Dogee
-Dogee is a C++ library for distributed programming on distributed shared memory (DSM) by shared memory multithreading model. Usually, DSM systems provide developers "get" and "set" APIs to use the shared memory. Dogee allows developers to operate the distributed shared memory in a similar way they operate local memory by C++, without using "get" and "set" explicitly. By using Birdee, developers can create arrays, shared variables and objects in DSM.
+# STEP
+STEP is a C++ library for distributed programming on distributed shared memory (DSM) by shared memory multithreading model. Usually, DSM systems provide developers "get" and "set" APIs to use the shared memory. STEP allows developers to operate the distributed shared memory in a similar way they operate local memory by C++, without using "get" and "set" explicitly. By using Birdee, developers can create arrays, shared variables and objects in DSM.
 
-[Birdee](https://github.com/Menooker/Birdee/) is a sister project, which is a new distributed programming language. Dogee can be viewed as Birdee in C++.
 
 ## Build instructions
 
-### Build Dogee on Ubuntu
+### Build STEP on Ubuntu
 Make sure your g++ compiler supports c++11 features.
 ```bash
 sudo apt-get install libmemcached-dev
@@ -13,11 +12,11 @@ make
 ```
 Now the binary files will be ready in the "bin" directory.
 
-### Build Dogee on Windows
-Dogee is based on libmemcached. This repository has included the libmemcached library (.lib and .dll) for Windows (for both debug and release mode and both x86 and x64 mode). You just need to open "Dogee.sln" and build Dogee with Visual Studio 2013 (or newer). Note that there are some bugs in the compiler of original version of VS2013, and you should update VS2013 to make Dogee compile.
+### Build STEP on Windows
+STEP is based on libmemcached. This repository has included the libmemcached library (.lib and .dll) for Windows (for both debug and release mode and both x86 and x64 mode). You just need to open "Dogee.sln" and build STEP with Visual Studio 2013 (or newer). Note that there are some bugs in the compiler of original version of VS2013, and you should update VS2013 to make STEP compile.
 
 ## Write a Hello World program
-We now show that how to write a simple program with Dogee.
+We now show that how to write a simple program with STEP.
 ```C++
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +61,7 @@ This program defines a global variable "g_int" which can be shared between maste
 In this section, we take the Hello World program above as an example. After you build it, we assume you get a binary "HelloWorld". Copy the binary file to all machines in the cluster.
 
 ### Run memcached
-The current version of Dogee is supported by memcached. On master and slaves, you should run mamcached in advance. Note that memcached may evict data as it is a cache service. To use it as an implementation of DSM, you should add "-M" option in the arguments when starting memcached, and adjust the memory limit by the argement "-m MEM_SIZE".
+The current version of STEP is supported by memcached. On master and slaves, you should run mamcached in advance. Note that memcached may evict data as it is a cache service. To use it as an implementation of DSM, you should add "-M" option in the arguments when starting memcached, and adjust the memory limit by the argement "-m MEM_SIZE".
 
 ### Start the slave node
 ```bash
@@ -87,7 +86,7 @@ MemServers=
 ```
 
  * "MasterPort" is the port that master node will listen.
- * "DSMBackend" will select the kind of DSM for Dogee. Currently, we support coarse-grained mode ("ChunkMemcached") and fine-grained mode ("Memcached") of memcached as DSM. Coarse-grained mode usually works better in applications which often move large chunks of data between DSM and local memory.
+ * "DSMBackend" will select the kind of DSM for STEP. Currently, we support coarse-grained mode ("ChunkMemcached") and fine-grained mode ("Memcached") of memcached as DSM. Coarse-grained mode usually works better in applications which often move large chunks of data between DSM and local memory.
  * "DSMCache" will select the kind of cache for DSM. The available options include "NoCache" (using DSM directly) and "WriteThroughCache" (using a write through cache)
  
 ### Run the master node and the whole cluster
@@ -102,9 +101,9 @@ Note that the parameters following the command "./HelloWorld" will be read by th
 ### Shared Class and Object Reference
 Include header file "DogeeBase.h" and "DogeeMacro.h" to use the features.
 
-To define a class to be stored in DSM, the class or its base class should extend the Dogee base class "Dogee::DObject". A "referenece" in Dogee is the counterpart of pointers in C++, while pointers point to objects in local memory, and refereneces point to objects in shared memory.
+To define a class to be stored in DSM, the class or its base class should extend the STEP base class "Dogee::DObject". A "referenece" in STEP is the counterpart of pointers in C++, while pointers point to objects in local memory, and refereneces point to objects in shared memory.
 
-To declare member variables in the class, you should first "call" the macro "DefBegin(BASE_CLASS_NAME);". Then define the members by macro "Def(VARIABLE_NAME,TYPE)". Define referenece by "DefRef(Type,isVirtual,Name)", or by "Def(Dogee::Ref\<TYPE>,VARIABLE_NAME)". Use "self" instead of "this" in the class's member functions. "Call" macro "DefEnd();" after defining the last member variable of a class. An example of defining a Dogee class.
+To declare member variables in the class, you should first "call" the macro "DefBegin(BASE_CLASS_NAME);". Then define the members by macro "Def(VARIABLE_NAME,TYPE)". Define referenece by "DefRef(Type,isVirtual,Name)", or by "Def(STEP::Ref\<TYPE>,VARIABLE_NAME)". Use "self" instead of "this" in the class's member functions. "Call" macro "DefEnd();" after defining the last member variable of a class. An example of defining a STEP class.
 
 ```C++
 class clsa : public DObject
@@ -137,12 +136,12 @@ public:
 ```
 
 IMPORTANT NOTES: 
- * The macro "DefEnd();" should be delared to be public in a Dogee class. 
+ * The macro "DefEnd();" should be delared to be public in a STEP class. 
  * The first parameter of the consturtors should always be "ObjectKey obj_id", and the base class constructor BASE_CLASS(obj_id) should always be called
  * The constructor CLASS_NAME(ObjectKey obj_id) : BASE_CLASS_NAME(obj_id) should always be declared and have empty body.
  * Override Destroy() as the destructor.
 
-To create Dogee class instance, use Dogee::NewObj\<CLASS_NAME>(PARAMETER_LIST), where PARAMETER_LIST is the list of parameters for the class constructor. However, the first paramter of the constructors is always "ObjectKey obj_id", which is provided by the Dogee system, and you should omit the first paramter of the constructors in PARAMETER_LIST. For example, to create a "clsa" object defined above.
+To create STEP class instance, use Dogee::NewObj\<CLASS_NAME>(PARAMETER_LIST), where PARAMETER_LIST is the list of parameters for the class constructor. However, the first paramter of the constructors is always "ObjectKey obj_id", which is provided by the STEP system, and you should omit the first paramter of the constructors in PARAMETER_LIST. For example, to create a "clsa" object defined above.
 ```C++
 Ref<clsa> ptr = NewObj<clsa>(32);
 DelObj(ptr);
@@ -215,11 +214,11 @@ extern void CloseCluster();
 ```
 The above is the main interfaces for cluster management. For simplicity, we have omitted some trivial codes in the declaration of the APIs provided in this section.
 
-The HelperInitCluster API is responsible for initializing Dogee environment and establishing connections among the compute nodes during initialization. 
+The HelperInitCluster API is responsible for initializing STEP environment and establishing connections among the compute nodes during initialization. 
 This function acts differently on the master and slaves. 
-Specifically, it parses the arguments from the command line, and then decides whether the current process will run under master mode or slave mode. HelperInitCluster should be called in "main()" before any Dogee APIs are called. You should forward argc and argv parameters of main to it too. Note that the master node and the slave nodes runs the same program, but with different starting arguments. If you start a Dogee program by command "-s PORT", where PORT is the port number, it will run in slave mode.
+Specifically, it parses the arguments from the command line, and then decides whether the current process will run under master mode or slave mode. HelperInitCluster should be called in "main()" before any STEP APIs are called. You should forward argc and argv parameters of main to it too. Note that the master node and the slave nodes runs the same program, but with different starting arguments. If you start a STEP program by command "-s PORT", where PORT is the port number, it will run in slave mode.
 
-In master mode, HelperInitCluster initializes the cluster by i) reading the settings from local configuration file, "DogeeConfig.txt" at the "current" directory, ii) connecting Dogee master to the selected slaves and key-value store servers, and iii) forwarding configuration information to all slaves. In master mode, the function will return and continue the execution of "main()". In slave mode, HelperInitCluster makes the slave node wait for the connection from the master and respond to the master's commands and it will never return to "main()" (it will call exit() when the cluster is closed).
+In master mode, HelperInitCluster initializes the cluster by i) reading the settings from local configuration file, "DogeeConfig.txt" at the "current" directory, ii) connecting STEP master to the selected slaves and key-value store servers, and iii) forwarding configuration information to all slaves. In master mode, the function will return and continue the execution of "main()". In slave mode, HelperInitCluster makes the slave node wait for the connection from the master and respond to the master's commands and it will never return to "main()" (it will call exit() when the cluster is closed).
 
 The CloseCluster API is used to shut down the cluster, which can only be invoked by \bird master.
 
@@ -232,7 +231,7 @@ class DThread : public DEvent{
 	bool Join(int timeout=-1);
 };
 ```
-Dogee allows users to specify the number of working threads to be created in each slave. This is achieved by using the DThread class, a shared class in Dogee. To create a working thread on a slave node and specify the entry function of it, users need to create a DThread object using NewObj API.
+STEP allows users to specify the number of working threads to be created in each slave. This is achieved by using the DThread class, a shared class in STEP. To create a working thread on a slave node and specify the entry function of it, users need to create a DThread object using NewObj API.
 An instance of DThread represents a working thread on a slave node.
 
 The constructor of DThread takes three arguments: 
@@ -244,7 +243,7 @@ Users can get the state of a thread (i.e., alive or completed) via the member fu
 
 "Join" API will let the current thread blocked until the completion of the thread. It takes an parameter of "timeout", in milliseconds. If timeout is not -1, the current thread will be waiting at most "timeout" milliseconds. If the wait time is out, Join will return false. Otherwise, it returns true.
 
-Note that we declare DThread as a shared class so that all its instances are stored in DSM and publicly available to Dogee cluster, which is critical for communication among Dogee master and slaves. 
+Note that we declare DThread as a shared class so that all its instances are stored in DSM and publicly available to STEP cluster, which is critical for communication among STEP master and slaves. 
 
 
 ### Distributed Thread Synchronization
@@ -267,7 +266,7 @@ class DEvent : public DObject{
 };
 ```
 
-The above lists Dogee interfaces for synchronizing distributed threads. They are encapsulated as shared classes.
+The above lists STEP interfaces for synchronizing distributed threads. They are encapsulated as shared classes.
 
 Note that just like the "Join" method of DThread, the interfaces that involves blocking the current thread has a parameter of "timeout". If timeout is -1, it will wait infinitely until the event it waits happens. Otherwise, the waiting has a timeout of "timeout" in milliseconds. If the waiting time is out, "false" will be returned.
 
@@ -282,7 +281,7 @@ We found that many real applications require to perform vector-wise accumulation
 For example, in PageRank computation, each working thread maintains a subset of vertices with their outgoing edges and computes the PageRank credits from its own vertices to the destination vertices along the edges. In each iteration, 
 credit vectors from the working threads are summed together to produce the new PageRank values for all vertices.
 
-A straightforward way for vector accumulation with Dogee is to ask working threads to transfer local vectors to DSM and then choose one thread to fetch all vectors to perform the final accumulation. 
+A straightforward way for vector accumulation with STEP is to ask working threads to transfer local vectors to DSM and then choose one thread to fetch all vectors to perform the final accumulation. 
 Let $N$ be the number of working threads. The above method incurs high network cost, i.e., the size of data to be transferred is (2N+1)*vector_size.
 
 #### Addition Accumulator
@@ -295,9 +294,9 @@ template<typename T>
 		bool AccumulateAndWait(T* buf, uint32_t len, T threshold = 0, int timeout = -1);
 	}
 ```
-Dogee provides DAddAccumulator class for users to perform vector accumulation more efficiently as well as hide data transfer details involved in vector accumulation.
+STEP provides DAddAccumulator class for users to perform vector accumulation more efficiently as well as hide data transfer details involved in vector accumulation.
 Users can create a shared DAddAccumulator object and initialize it with the number N of working threads involved in the accumulation (in_num_user) and an output shared array (outarr) in DSM and its length (outlen).
-The working threads can invoke AccumulateAndWait function defined in DAddAccumulator to send out their local vectors and Dogee will compute the final accumulated result and store it in the output shared array automatically.
+The working threads can invoke AccumulateAndWait function defined in DAddAccumulator to send out their local vectors and STEP will compute the final accumulated result and store it in the output shared array automatically.
 The AccumulateAndWait function also serves as a synchronization point which will not return until all the $N$ threads send out their local vectors.
  * "buf" is the local vector to send.
  * "len" is its length. 
@@ -384,10 +383,10 @@ auto ptr=NewObj<MulAccumulator>(arr,len,thread_count);
 ```
 
 ### Fault tolerance: Checkpoint
-Dogee provides fault tolerance by checkpoints via files. Dogee will peroidically write the whole DSM data and user-specified local memory data to local files. Dogee provides a special barrier DCheckpointBarrier. Every time a node enters DCheckpointBarrier, Dogee will do a checkpoint on disk.
+STEP provides fault tolerance by checkpoints via files. STEP will peroidically write the whole DSM data and user-specified local memory data to local files. STEP provides a special barrier DCheckpointBarrier. Every time a node enters DCheckpointBarrier, STEP will do a checkpoint on disk.
 
-#### Core of Dogee Fault tolerance: Checkpoint class
-To use Dogee's checkpoint, you should first write two checkpoint class, one for slave nodes, one for master node. A checkpoint class specifies the local variables that a master/slave node wants to save, the bahavior of creating a checkpoint and the behavior of restoring from a checkpoint. Note that all data in DSM (including global shared variables) will be automatically dumped into the checkpoint file when Dogee is doing a checkpoint.
+#### Core of STEP Fault tolerance: Checkpoint class
+To use STEP's checkpoint, you should first write two checkpoint class, one for slave nodes, one for master node. A checkpoint class specifies the local variables that a master/slave node wants to save, the bahavior of creating a checkpoint and the behavior of restoring from a checkpoint. Note that all data in DSM (including global shared variables) will be automatically dumped into the checkpoint file when STEP is doing a checkpoint.
 
 We now illustrate Checkpoint class by an example. Suoopose on slave nodes, we have a global variable (stored in local memory) called "slave_count" that we want to store in/restore from the checkpoints. Similarly we have a global variable (stored in local memory) called "master_count". We first create a checkpoint class for slave nodes.
 
@@ -402,7 +401,7 @@ public:
 SerialDecl(SlaveCheckPoint, slave_count, std::reference_wrapper<int>);
 ```
 
-In this class, we use macro SerialDef(variable_name,type) to declare a member in the class, and macro SerialDecl(class_name,variable_name,type) outside of the class to define a member. The members of Checkpoint classes will be serialized into checkpoint files. Note that we use a std::reference_wrapper to define the member slave_count, and associate it with the gloabl variable slave_count in local memory. Dogee will automatically write the value of global variable "slave_count" into checkpoint file and restore it from checkpoint file.
+In this class, we use macro SerialDef(variable_name,type) to declare a member in the class, and macro SerialDecl(class_name,variable_name,type) outside of the class to define a member. The members of Checkpoint classes will be serialized into checkpoint files. Note that we use a std::reference_wrapper to define the member slave_count, and associate it with the gloabl variable slave_count in local memory. STEP will automatically write the value of global variable "slave_count" into checkpoint file and restore it from checkpoint file.
 
 In this example, we write a different checkpoint class for master node.
 
@@ -425,10 +424,10 @@ public:
 };
 SerialDecl(MasterCheckPoint,master_count, std::reference_wrapper<int>);
 ```
-We similarly store a reference to "master_count" in MasterCheckPoint, and it will also automatically saved and restored. Also, in checkpoint classes for both master and slave nodes, we can override DoRestart() and DoCheckpoint() method to specify the behavior of restarting and checkpointing. Note that if a Dogee program will checkpoint on breaks down half way and gets restarted, the process on master node will invoke DoRestart() of checkpoint class of master node and will invoke exit() when DoRestart() is done.
+We similarly store a reference to "master_count" in MasterCheckPoint, and it will also automatically saved and restored. Also, in checkpoint classes for both master and slave nodes, we can override DoRestart() and DoCheckpoint() method to specify the behavior of restarting and checkpointing. Note that if a STEP program will checkpoint on breaks down half way and gets restarted, the process on master node will invoke DoRestart() of checkpoint class of master node and will invoke exit() when DoRestart() is done.
 
-#### Use of Dogee Fault tolerance
-To start a Dogee program with checkpoint on, we call HelperInitClusterCheckPoint instead of HelperInitCluster at the start of main().
+#### Use of STEP Fault tolerance
+To start a STEP program with checkpoint on, we call HelperInitClusterCheckPoint instead of HelperInitCluster at the start of main().
 ```C++
 template<typename MasterCheckPointType, typename SlaveCheckPointType>
 void HelperInitClusterCheckPoint(int argc, char* argv[], const char* appname = nullptr)
